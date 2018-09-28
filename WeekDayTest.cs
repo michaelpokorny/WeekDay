@@ -25,7 +25,7 @@ namespace WeekDay
 			AssertWeekDayAndMonth(2, 1, WeekDay.Thursday);
 			AssertWeekDayAndMonth(2, 2, WeekDay.Friday);
 			AssertWeekDayAndMonth(2, 3, WeekDay.Saturday);
-
+			
 			AssertWeekDayAndMonth(3, 1, WeekDay.Thursday);
 			
 			AssertWeekDayAndMonth(4, 1, WeekDay.Sunday);
@@ -41,6 +41,23 @@ namespace WeekDay
 			AssertWeekDayAndMonth(12, 1, WeekDay.Saturday);
 		}
 
+		[TestMethod]
+		public void DaysAndMonthsAndYearsToWeekDays()
+		{
+			AssertWeekDayAndMonthAndYear(2015, 1, 1, WeekDay.Thursday);
+			AssertWeekDayAndMonthAndYear(2015, 12, 31, WeekDay.Thursday);
+			AssertWeekDayAndMonthAndYear(2016, 1, 1, WeekDay.Friday);
+			AssertWeekDayAndMonthAndYear(2016, 12, 31, WeekDay.Saturday);
+			AssertWeekDayAndMonthAndYear(2017, 1, 1, WeekDay.Sunday);
+			AssertWeekDayAndMonthAndYear(2017, 12, 31, WeekDay.Sunday);
+
+		}
+
+		private void AssertWeekDayAndMonthAndYear(int year, int month, int day, WeekDay expected) {
+			Assert.AreEqual(expected, CalculateDayOfWeek(year, month, day));
+		}
+
+
 
 		
 		private void AssertWeekDayAndMonth(int month, int day, WeekDay expected)
@@ -55,18 +72,57 @@ namespace WeekDay
 
 		private WeekDay CalculateDayOfWeek(int year, int month, int day)
 		{
-			int shiftDays = GetShiftDays(month);
-			
+			int shiftDays = GetShiftDaysMonths(month);
+
+			shiftDays += GetShiftDaysYears(year, month);
+
 			return (WeekDay)((day+shiftDays)%7);
 		}
 
-		private int GetShiftDays(int month)
+		private int GetShiftDaysMonths(int month)
 		{
 			int[] offsets = {0, 3, 3, 6, 1, 4, 6, 2, 5, 0, 3, 5};
 
 			return offsets[month-1];
 		}
-		// different years
+
+		private int GetShiftDaysYears(int year, int month)
+		{
+			// wir sind im refactoring schritt -> das gehoert u.a. in GetShiftDaysMonths
+			// 
+			
+			int shiftDays = 0;
+
+			if (IsLeapYear(year) && month > 2) {
+				shiftDays+=1;
+			}
+
+			if (year == 2017)
+			{
+				shiftDays+=6;
+			}
+
+			if (year == 2016)
+			{
+				shiftDays+=4;
+			}
+			
+
+			if (year == 2015) {
+				shiftDays+=3;
+			}
+
+			return shiftDays;
+		}
+
+		private bool IsLeapYear(int year)
+        {
+            return (year % 4 == 0
+                    && year % 100 != 0)
+                || year % 400 == 0;
+        }
+
+		// different years - doing this
 		// leap years
 		// centuries
 		// millenia
